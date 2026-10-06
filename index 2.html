@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ORGANIZING UNIT</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1f4e79">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Org Unit">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1d2433;--mute:#6b7280;--acc:#1f4e79;--ok:#2e7d32;--line:#e3dfd6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141c;--card:#192030;--ink:#eef0f4;--mute:#9aa3b2;--acc:#7fb2e5;--ok:#6fcf74;--line:#2a3347}}
+:root[data-theme="dark"]{--bg:#10141c;--card:#192030;--ink:#eef0f4;--mute:#9aa3b2;--acc:#7fb2e5;--ok:#6fcf74;--line:#2a3347}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+main{width:100%;max-width:1100px;margin:0 auto;padding:12px;display:grid;grid-template-columns:1fr;gap:10px}
+h1,.date{grid-column:1/-1}
+.card{margin-bottom:0}
+#anns{max-height:28vh;overflow-y:auto}
+@media (min-width:760px){main{grid-template-columns:1fr 1fr;padding:18px;gap:14px;min-height:100vh;align-content:start}#anns{max-height:34vh}}
+@media (max-width:759px){.verse{font-size:.98rem}.btn{padding:11px;margin-top:6px}.card{padding:11px}}
+h1{margin:4px 0 0;font-size:1.4rem;letter-spacing:.12em;color:var(--acc)}
+.date{color:var(--mute);font-size:.9rem;margin-bottom:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+h2{margin:0 0 8px;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mute)}
+.verse{font-family:Georgia,serif;font-size:1.05rem}.ref{color:var(--acc);font-size:.85rem;margin-top:4px}
+.btn{display:flex;width:100%;align-items:center;justify-content:space-between;padding:14px;margin-top:8px;border:2px solid var(--line);border-radius:12px;background:transparent;color:var(--ink);font-size:1rem;cursor:pointer}
+.btn.done{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.btn .s{color:var(--mute);font-size:.85rem}.btn.done .s{color:var(--ok);font-weight:600}
+.stats{display:flex;gap:8px}.stat{flex:1;text-align:center;background:var(--bg);border-radius:10px;padding:8px}
+.stat b{display:block;font-size:1.3rem;color:var(--acc)}.stat span{font-size:.75rem;color:var(--mute)}
+.week{display:flex;gap:6px;margin-top:10px}.day{flex:1;text-align:center;font-size:.7rem;color:var(--mute)}
+.dot{height:22px;margin-top:3px;border-radius:6px;background:var(--line)}.dot.on{background:var(--ok)}.dot.half{background:color-mix(in srgb,var(--ok) 45%,var(--line))}
+.ann{border-top:1px solid var(--line);padding:8px 0}.ann:first-of-type{border-top:0}.ann small{color:var(--mute)}
+.ann button{float:right;background:none;border:0;color:var(--mute);cursor:pointer}
+textarea,input{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;margin-top:6px}
+.post{margin-top:8px;padding:10px 16px;border:0;border-radius:10px;background:var(--acc);color:var(--bg);font-weight:600;cursor:pointer}
+table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{padding:6px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--mute);font-weight:600}
+#admin,#who{grid-column:1/-1}.admbtn{float:right;font-size:.7rem;letter-spacing:0;padding:5px 10px;border:1px solid var(--acc);border-radius:20px;background:none;color:var(--acc);cursor:pointer}
+</style>
+</head>
+<body>
+<main>
+  <h1>ORGANIZING UNIT <button id="adm" class="admbtn">Admin</button></h1>
+  <div class="date" id="date"></div>
+
+  <div class="card" id="who" hidden><h2>Welcome — enter your name</h2><input id="nm" placeholder="Your full name"><button class="post" id="join">Join</button></div>
+  <div class="card" id="admin" hidden><h2>Admin · Member Activity</h2><input type="date" id="ad"><p id="asum" style="margin:8px 0;font-weight:600"></p><div style="overflow-x:auto"><table><thead><tr><th>Name</th><th>Prayed</th><th>Bible</th><th>Books</th></tr></thead><tbody id="arows"></tbody></table></div></div>
+  <div class="card"><h2>Daily Bible Verse</h2><div class="verse" id="bv"></div><div class="ref" id="br"></div></div>
+  <div class="card"><h2>Motivational Verse</h2><div class="verse" id="mv"></div><div class="ref" id="mr"></div></div>
+
+  <div class="card">
+    <h2>Today's Check-in</h2>
+    <button class="btn" id="b-prayed"><span>🙏 I have prayed</span><span class="s"></span></button>
+    <button class="btn" id="b-bible"><span>📖 I have read my Bible</span><span class="s"></span></button>
+    <button class="btn" id="b-books"><span>📚 I have read my books</span><span class="s"></span></button>
+    <div class="stats" style="margin-top:12px">
+      <div class="stat"><b id="st1">0</b><span>Spiritual streak</span></div>
+      <div class="stat"><b id="st2">0</b><span>Reading streak</span></div>
+    </div>
+    <div class="week" id="week"></div>
+  </div>
+
+  <div class="card">
+    <h2>Announcements</h2>
+    <div id="anns"></div>
+    <div id="annform"><input id="at" placeholder="Title">
+    <textarea id="am" rows="2" placeholder="Write an announcement..."></textarea>
+    <button class="post" id="post">Post announcement</button></div>
+  </div>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+const BIBLE=[["The Lord is my shepherd; I shall not want.","Psalm 23:1"],["Thy word is a lamp unto my feet, and a light unto my path.","Psalm 119:105"],["Trust in the Lord with all thine heart; and lean not unto thine own understanding.","Proverbs 3:5"],["Be still, and know that I am God.","Psalm 46:10"],["Seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.","Matthew 6:33"],["Pray without ceasing.","1 Thessalonians 5:17"],["The Lord is my light and my salvation; whom shall I fear?","Psalm 27:1"]];
+const MOTI=[["I can do all things through Christ which strengtheneth me.","Philippians 4:13"],["Be strong and of a good courage; be not afraid, neither be thou dismayed.","Joshua 1:9"],["Whatsoever thy hand findeth to do, do it with thy might.","Ecclesiastes 9:10"],["They that wait upon the Lord shall renew their strength.","Isaiah 40:31"],["Let us not be weary in well doing: for in due season we shall reap, if we faint not.","Galatians 6:9"],["Commit thy works unto the Lord, and thy thoughts shall be established.","Proverbs 16:3"],["For I know the thoughts that I think toward you, saith the Lord, thoughts of peace, and not of evil.","Jeremiah 29:11"]];
+const $=id=>document.getElementById(id);
+const key=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+function load(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch(e){return def}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+const CFG=window.OU_CONFIG||{},F=CFG.firebase;
+let db=null;
+try{if(window.firebase&&F&&F.apiKey&&!/PASTE/.test(F.apiKey)){firebase.initializeApp(F);db=firebase.firestore()}}catch(e){console.error(e)}
+const live=!!db;
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let log=load("ou_log",{}),anns=load("ou_anns",[]),me=load("ou_me",null),admin=false,members={},cks={},unsubs=[];
+const today=new Date(),tk=key(today);
+const doy=Math.floor((today-new Date(today.getFullYear(),0,0))/864e5);
+$("date").textContent=today.toLocaleDateString(undefined,{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+const bv=BIBLE[doy%BIBLE.length],mv=MOTI[doy%MOTI.length];
+$("bv").textContent="\u201c"+bv[0]+"\u201d";$("br").textContent=bv[1];
+$("mv").textContent="\u201c"+mv[0]+"\u201d";$("mr").textContent=mv[1];
+const items=["prayed","bible","books"];
+function streak(test){let n=0,d=new Date(today);if(!test(log[key(d)]||{}))d.setDate(d.getDate()-1);
+ while(test(log[key(d)]||{})){n++;d.setDate(d.getDate()-1)}return n}
+function render(){
+ const t=log[tk]||{};
+ items.forEach(i=>{const b=$("b-"+i);b.classList.toggle("done",!!t[i]);b.querySelector(".s").textContent=t[i]?"Done \u2713":"Tap to mark"});
+ $("st1").textContent=streak(e=>e.prayed||e.bible);
+ $("st2").textContent=streak(e=>e.books);
+ let w="";for(let i=6;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const e=log[key(d)]||{};
+  const c=(e.prayed?1:0)+(e.bible?1:0)+(e.books?1:0);
+  w+=`<div class="day">${d.toLocaleDateString(undefined,{weekday:"narrow"})}<div class="dot ${c>=3?"on":c>0?"half":""}"></div></div>`}
+ $("week").innerHTML=w;
+ const canEdit=!live||admin;
+ $("annform").hidden=!canEdit;
+ $("anns").innerHTML=anns.length?anns.map((a,i)=>`<div class="ann">${canEdit?`<button data-i="${i}" aria-label="Delete">\u2715</button>`:""}<b>${esc(a.title)}</b><div>${esc(a.msg)}</div><small>${esc(a.date)}</small></div>`).join(""):'<div class="ann"><small>No announcements yet.</small></div>';
+ document.querySelectorAll("#anns button").forEach(b=>b.onclick=()=>{const a=anns[+b.dataset.i];
+  if(live){db.collection("announcements").doc(a.id).delete()}else{anns.splice(+b.dataset.i,1);save("ou_anns",anns);render()}});
+ $("who").hidden=!!me;
+ $("admin").hidden=!admin;
+ $("adm").textContent=admin?"Exit admin":"Admin";
+}
+function sync(){if(!live||!me)return;const t=log[tk]||{};
+ db.collection("checkins").doc(tk+"_"+me.id).set({date:tk,id:me.id,name:me.name,prayed:!!t.prayed,bible:!!t.bible,books:!!t.books,t:Date.now()}).catch(console.error)}
+items.forEach(i=>$("b-"+i).onclick=()=>{
+ if(!me){$("who").hidden=false;$("nm").focus();return}
+ log[tk]=log[tk]||{};log[tk][i]=!log[tk][i];save("ou_log",log);render();sync()});
+$("join").onclick=()=>{const n=$("nm").value.trim();if(!n)return;
+ me={id:Math.random().toString(36).slice(2,10),name:n};save("ou_me",me);
+ if(live)db.collection("members").doc(me.id).set({name:n}).catch(console.error);
+ render();sync()};
+$("post").onclick=()=>{const title=$("at").value.trim()||"Announcement",msg=$("am").value.trim();if(!msg&&!$("at").value.trim())return;
+ const a={title,msg,date:today.toLocaleDateString(),t:Date.now()};
+ if(live)db.collection("announcements").add(a).catch(console.error);
+ else{anns.unshift(a);save("ou_anns",anns);render()}
+ $("at").value=$("am").value=""};
+if(live)db.collection("announcements").orderBy("t","desc").limit(30).onSnapshot(s=>{anns=s.docs.map(d=>({id:d.id,...d.data()}));render()});
+function drawAdmin(){
+ const ids=Object.keys(members);Object.keys(cks).forEach(i=>{if(!ids.includes(i))ids.push(i)});
+ let done=0;
+ const rows=ids.map(i=>{const c=cks[i]||{},n=members[i]||c.name||"Member";if(c.prayed||c.bible||c.books)done++;
+  return `<tr><td>${esc(n)}</td><td>${c.prayed?"\u2705":"\u2013"}</td><td>${c.bible?"\u2705":"\u2013"}</td><td>${c.books?"\u2705":"\u2013"}</td></tr>`}).join("");
+ $("asum").textContent=live?`${done} of ${ids.length} members checked in`:"Connect Firebase to see members' activity.";
+ $("arows").innerHTML=rows||'<tr><td colspan="4">No members yet.</td></tr>'}
+function watch(){unsubs.forEach(u=>u());unsubs=[];drawAdmin();if(!live)return;const d=$("ad").value||tk;
+ unsubs.push(db.collection("members").onSnapshot(s=>{members={};s.forEach(x=>members[x.id]=x.data().name);drawAdmin()}));
+ unsubs.push(db.collection("checkins").where("date","==",d).onSnapshot(s=>{cks={};s.forEach(x=>cks[x.data().id]=x.data());drawAdmin()}))}
+$("ad").value=tk;$("ad").onchange=watch;
+$("adm").onclick=()=>{if(admin){admin=false;unsubs.forEach(u=>u());unsubs=[]}
+ else{const p=prompt("Enter admin PIN");if(p===null)return;if(p!==String(CFG.adminPin)){alert("Wrong PIN");return}admin=true;watch()}
+ render()};
+render();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+</script>
+</body>
+</html>
